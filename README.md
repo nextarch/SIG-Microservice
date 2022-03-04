@@ -13,7 +13,7 @@ SIG-Microservice is committed to providing a standardized service discovery and 
 
 **End User Education (Outbound Communication)**
 
-- Provide up-to-date, high quality, unbiased and easy-to-consume material to help end users to understand and effectively adopt microservice technologies and practises within the SIG’s area, for example: White papers, presentations, videos, or other forms of training clarifying terminology, comparisons of different approaches, available projects or products, common or recommended practises, trends, illustrative successes and failures, etc.
+Provide up-to-date, high quality, unbiased and easy-to-consume material to help end users to understand and effectively adopt microservice technologies and practises within the SIG’s area, for example: White papers, presentations, videos, or other forms of training clarifying terminology, comparisons of different approaches, available projects or products, common or recommended practises, trends, illustrative successes and failures, etc.
 
 **As Trusted Expert Advisors to the TOC**
 
