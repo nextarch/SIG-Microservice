@@ -3,14 +3,14 @@
 
 ## SIG Member
 
-| Name          | Organization         | Email |
-| ------------- | -------------------- | ----- |
-| Hongzhi Wang  | Tencent              | |
-| Shibai Wei    | Kuaishou             | |
-| Xiang Yu      | Bluefocus            | |
-| Ke Su         | TAL                  | |
-| Junfeng Wan   | go-zero              | |
-| Qiang Guo     | GoFrame              | |
-| Guangming Luo | CloudWeGo            | |
-| Le Zhang      | Spring Cloud Tencent | |
-| Jiajun Shan   | Polarismesh          | |
+| Name          | Organization         |
+| ------------- | -------------------- |
+| Hongzhi Wang  | Tencent   |
+| Shibai Wei    | Kuaishou  |
+| Xiang Yu      | Bluefocus |
+| Ke Su         | TAL       |
+| Junfeng Wan   | [go-zero](https://github.com/zeromicro)   |
+| Qiang Guo     | [GoFrame](https://github.com/gogf)        |
+| Guangming Luo | [CloudWeGo](https://github.com/cloudwego) |
+| Le Zhang      | [Spring Cloud Tencent](https://github.com/Tencent/spring-cloud-tencent) |
+| Jiajun Shan   | [Polarismesh](https://github.com/polarismesh) |
