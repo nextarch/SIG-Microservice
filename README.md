@@ -28,8 +28,10 @@ Provide up-to-date, high quality, unbiased and easy-to-consume material to help 
 | Shibai Wei    | Kuaishou  |
 | Xiang Yu      | Bluefocus |
 | Ke Su         | TAL       |
-| Le Zhang      | [Spring Cloud Tencent](https://github.com/Tencent/spring-cloud-tencent) |
+| Bo Zhang      | BIGO      |
+| Jiajun Shan   | [Polarismesh](https://github.com/polarismesh) |
 | Junfeng Wan   | [go-zero](https://github.com/zeromicro)   |
 | Qiang Guo     | [GoFrame](https://github.com/gogf)        |
 | Guangming Luo | [CloudWeGo](https://github.com/cloudwego) |
-| Jiajun Shan   | [Polarismesh](https://github.com/polarismesh) |
+| Le Zhang      | [Spring Cloud Tencent](https://github.com/Tencent/spring-cloud-tencent) |
+| Kaiyuan Li    | [TARS](https://github.com/TarsCloud/Tars) |
