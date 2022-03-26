@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/wrappers.proto";
+
+// Geolocation information for nearby routing
+message Location {
+  google.protobuf.StringValue region = 1;
+  google.protobuf.StringValue zone = 2;
+  google.protobuf.StringValue campus = 3;
+}
+
+// Instance, a node that can provide service interface network calls, uniquely
+// identified by IP:PORT
+message Instance {
+
+  // namespace name
+  google.protobuf.StringValue namespace = 1;
+
+  // service name
+  google.protobuf.StringValue service = 2;
+
+  // IPv4 or IPv6 address on which the instance listens
+  google.protobuf.StringValue host = 3;
+
+  // instance corresponds to the listening port of the calling protocol
+  google.protobuf.UInt32Value port = 4;
+
+  // calling protocol exposed by the instance
+  google.protobuf.StringValue protocol = 5;
+
+  // Instance version, which can be used in routing rules
+  google.protobuf.StringValue version = 6;
+
+  // Instance weight information for load balancing
+  google.protobuf.UInt32Value weight = 7;
+
+  // The health status of the instance, through different health check methods
+  // to determine whether the instance can provide external services
+  google.protobuf.BoolValue healthy = 8;
+
+  // When this value is true, the instance is in an isolated state and should
+  // not be returned to the caller
+  google.protobuf.BoolValue isolate = 9;
+
+  // The location information of the instance, which is used to process the
+  // nearest route
+  Location location = 10;
+
+  // Instance metadata, which is used to store additional attribute data of the
+  // instance, such as instance grouping information, instance startup time
+  map<string, string> metadata = 11;
+}

@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/wrappers.proto";
+
+// Load balancer, weight random => "weightedRandom"
+// Load balancer, consistency hash ring => "ringHash"
+// Load balancer, maglev Hash => "maglev"
+// Load balancer, ordinary hash => "hash"
+// Load balancer, shortest response time => "ShortestResponse"
+// Load balancer, least active first => "LeastActive"
+// Load balancer, adaptive => "Adaptive"
+
+enum LbPolicy {
+  WeightedRandom = 0;
+  RingHash = 1;
+  Maglev = 2;
+  Hash = 3;
+  LeastActive = 4;
+  ShortestResponse = 5;
+  Adaptive = 6;
+}
+
+// Loadbalancer
+message Loadbalancer {
+  // The namespace to which the load balancer belongs
+  google.protobuf.StringValue namespace = 1;
+  // The service to which the load balancer belongs
+  google.protobuf.StringValue service = 2;
+  // Selected load balancing strategy
+  LbPolicy policy = 3;
+  // Additional configuration information for the corresponding policy
+  map<string, string> options = 4;
+}

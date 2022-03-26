@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/wrappers.proto";
+
+// Namespace, mainly used for environment isolation, manages services,
+// instances, and governance rules in the same environment, but still allows
+// service calls across namespaces
+message Namespace {
+  // namespace name
+  google.protobuf.StringValue name = 1;
+}

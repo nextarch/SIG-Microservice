@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/wrappers.proto";
+
+// A service is an abstract way of exposing resources to the outside world. The
+// resource itself provides network access through port monitoring, and provides
+// a series of predefined service interfaces to call the host.
+message Service {
+
+  // The namespace to which the service belongs
+  google.protobuf.StringValue namespace = 1;
+
+  // The name of the service, namespace + name is the unique identifier of the
+  // service
+  google.protobuf.StringValue name = 2;
+
+  // Metadata information of the service, which can store service tag data
+  map<string, string> metadata = 3;
+
+  // List of all ports the service listens on
+  google.protobuf.StringValue ports = 4;
+}

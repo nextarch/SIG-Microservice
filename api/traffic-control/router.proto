@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/wrappers.proto";
+
+// MatchString
+message MatchString {
+  enum MatchStringType {
+
+    // equivalent match
+    EXACT = 0;
+    // regular match
+    REGEX = 1;
+  }
+
+  enum ValueType {
+    // Routing rules write dead data  
+    TEXT = 0;
+    // Routing data is obtained from the Metadata of the Motorcycle Service
+    PARAMETER = 1;
+    // Get routing data from the environment variable of the main tone service
+    VARIABLE = 2;
+  }
+
+  // Matching rule
+  MatchStringType type = 1;
+
+  // Routing rules
+  google.protobuf.StringValue value = 2;
+
+  // Value type, specific acquisition path for routing rule values
+  ValueType value_type = 3;
+}
+
+message Routing {
+  // Rule belongs and namespace
+  google.protobuf.StringValue namespace = 1;
+  google.protobuf.StringValue service = 2;
+
+  // Each service can configure multiple inbound or outbound rules
+  // For each request, you can match from top to bottom, if you are in the
+  // middle, terminate
+  repeated Route inbounds = 3;
+  repeated Route outbounds = 4;
+}
+
+message Route {
+  // If you match the Source rule, follow the Destination route
+  // The relationship between multiple SOURCE is or
+  repeated Source sources = 1;
+  repeated Destination destinations = 2;
+}
+
+message Source {
+  // Main tuning service and namespace
+  google.protobuf.StringValue service = 1;
+  google.protobuf.StringValue namespace = 2;
+
+  // Master Control Service Example Tag or Request Label
+  // Value supports regular matching
+  map<string, MatchString> metadata = 3;
+}
+
+message Destination {
+  // Templated service and namespace
+  google.protobuf.StringValue service = 1;
+  google.protobuf.StringValue namespace = 2;
+
+  // Templated service example label
+  // Value supports regular matching
+  map<string, MatchString> metadata = 3;
+
+  // According to the service name and service instance Metadata Filter the
+  // qualified service instance subset Service instance subset can set priority
+  // and weight Priority: integer, range [0, 9], the highest priority is 0
+  // Weight: Integer
+  // Press priority routing, if there is high priority, low priority will not
+  // use If there is a subset of the same priority, then assign by weight
+  // Priority and weight can be not set / set up one / set two
+  // If the section is set priority, some are not set, it is considered that the
+  // priority is not set. If the part is set, some is not set, it is considered
+  // that the weight is not set to 0 If you have no weight, you think the weight
+  // is the same
+  google.protobuf.UInt32Value priority = 4;
+  google.protobuf.UInt32Value weight = 5;
+
+  // Forward requests to proxy service
+  google.protobuf.StringValue transfer = 6;
+
+  // Whether to isolate the SET, after isolation, no traffic will be allocated
+  google.protobuf.BoolValue isolate = 7;
+}
