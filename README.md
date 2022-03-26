@@ -1,5 +1,17 @@
 # SIG-Microservice
 
+English | [简体中文](./README-zh.md) 
+
+---
+
+README：
+
+- [Introduction](#introduction)
+- [Specification](#specification)
+- [Ecosystem](#ecosystem)
+- [SIG Members](#sig-members)
+- [SIG Responsibilities](#sig-responsibilities)
+
 ## Introduction
 
 SIG-Microservice is committed to providing a standardized service discovery and governance solution for distributed and microservice architecture. It applies to heterogeneous infrastructure such as multi-language, multi-framework, different runtime environments and hybrid cloud scenario.
@@ -25,9 +37,9 @@ SIG-Microservice is committed to providing a standardized service discovery and 
 | limiter         | [v1alpha1](/specification/limiter/limiter.md) |
 | authentication  | [v1alpha1](/specification/authentication/authentication.md) |
 
-## About SIG
+## Ecosystem
 
-### Members
+## SIG Members
 
 | Name          | Organization         |
 | ------------- | -------------------- |
@@ -43,7 +55,7 @@ SIG-Microservice is committed to providing a standardized service discovery and 
 | Le Zhang      | [Spring Cloud Tencent](https://github.com/Tencent/spring-cloud-tencent) |
 | Kaiyuan Li    | [TARS](https://github.com/TarsCloud/Tars) |
 
-### Responsibilities
+## SIG Responsibilities
 
 **End User Input Gathering (Inbound Communication)**
 
