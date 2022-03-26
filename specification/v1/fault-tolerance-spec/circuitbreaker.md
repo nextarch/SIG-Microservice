@@ -1,4 +1,4 @@
-# Circuitbreaker
+# Circuit breaker（熔断降级）
 
 ```yaml
 kind: Circuitbreaker
