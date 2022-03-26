@@ -18,8 +18,6 @@ SIG-Microservice is committed to providing a standardized service discovery and 
 
 ## Specification
 
-### Service Governance Specification
-
 |                                   |         Latest Release             |  
 | :-------------------------------- | :--------------------------------: |
 | **Serivce Specification**         |
