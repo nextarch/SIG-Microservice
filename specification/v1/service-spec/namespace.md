@@ -1,12 +1,13 @@
-# Namespace（命名空间）
+# Namespace
 
-## 定义
-
-命名空间提供了一种在相同注册中心下资源的逻辑隔离的机制，同一命名空间下的资源命名必须唯一，但是跨命名空间允许存在同名的资
-源。命名空间常用于多个团队或者项目之间的资源的区分隔离。
-
-## 属性
-
-#### name
-
-命名空间的名称，唯一
+```yaml
+kind: Namespace
+metadata:
+  name:
+spec:
+  labels:
+    - key:
+      value:
+    - key:
+      value:
+```
