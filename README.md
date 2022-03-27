@@ -14,7 +14,7 @@ README：
 
 ## Introduction
 
-Microservice SIG is committed to providing a standardized service governance solution for distributed and microservice architecture. This solution consists of specification, realization and best practice. It applies to heterogeneous infrastructure and development mode such as multi-language, multi-framework, different runtime environments and hybrid cloud scenario. 
+Microservice SIG is committed to providing a standardized service governance solution for distributed and microservice architecture. This solution consists of specification, realization and best practice. It applies to heterogeneous development and infrastructure such as multi-language, multi-framework, different runtime environments and hybrid cloud scenario. 
 
 ## Specification
 
