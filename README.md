@@ -39,19 +39,25 @@ SIG-Microservice is committed to providing a standardized service discovery and 
 
 ## SIG Members
 
-| Name          | Organization         |
-| ------------- | -------------------- |
-| Hongzhi Wang  | Tencent   |
-| Shibai Wei    | Kuaishou  |
-| Xiang Yu      | Bluefocus |
-| Ke Su         | TAL       |
-| Bo Zhang      | BIGO      |
-| Jiajun Shan   | [Polarismesh](https://github.com/polarismesh) |
-| Junfeng Wan   | [go-zero](https://github.com/zeromicro)   |
-| Qiang Guo     | [GoFrame](https://github.com/gogf)        |
-| Guangming Luo | [CloudWeGo](https://github.com/cloudwego) |
-| Le Zhang      | [Spring Cloud Tencent](https://github.com/Tencent/spring-cloud-tencent) |
-| Kaiyuan Li    | [TARS](https://github.com/TarsCloud/Tars) |
+***1-2 member per organization***
+
+| Name                        | Organization         |
+| --------------------------- | -------------------- |
+| Hongzhi Wang                | Tencent   |
+| Shibai Wei                  | Kuaishou  |
+| Xiang Yu                    | Bluefocus |
+| Ke Su                       | TAL       |
+| Bo Zhang                    | BIGO      |
+| Baohui Wei, Bin Fan         | China Mobile Information |
+| Guoguang Hu                 | Aspire |
+| Jiajun Shan, Chuntao Liao   | [Polaris](https://github.com/polarismesh) |
+| Shun Song                   | [Apollo](https://github.com/apolloconfig) |
+| Junfeng Wan                 | [go-zero](https://github.com/zeromicro)   |
+| Qiang Guo                   | [GoFrame](https://github.com/gogf)        |
+| Guangming Luo, Guozhu Cheng | [CloudWeGo](https://github.com/cloudwego) |
+| Le Zhang, Haotian Zhang     | [Spring Cloud Tencent](https://github.com/Tencent/spring-cloud-tencent) |
+| Kaiyuan Li                  | [TARS](https://github.com/TarsCloud) |
+| Zilong Tong, Zhixin Liu     | [Femas](https://github.com/polarismesh/femas) |
 
 ## SIG Responsibilities
 
