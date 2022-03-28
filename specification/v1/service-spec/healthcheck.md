@@ -1,5 +1,8 @@
 # Health check
 
+
+## HTTP detection form of health check
+
 ```yaml
 kind: HealthCheck
 metadata:
@@ -27,6 +30,8 @@ spec:
 ```
 
 
+## TCP detection form of health check
+
 ```yaml
 kind: HealthCheck
 metadata:
@@ -41,6 +46,8 @@ spec:
       timeout:
 ```
 
+
+## Actively report a health check in the form of heartbeat
 
 ```yaml
 kind: HealthCheck
