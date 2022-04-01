@@ -1,4 +1,4 @@
-# SIG-Microservice
+# Microservice
 
 English | [简体中文](./README-zh.md) 
 
