@@ -1,51 +1,40 @@
-# Instance（实例）
+# Instance
 
-## 定义
-
-服务实例对应的是可提供服务接口网络调用的节点，通过IP:PORT的方式进行唯一标识。
-
-## 属性
-
-#### namespace
-
-服务实例所属的命名空间 
-
-#### name
-
-服务实例所属的服务
-
-#### host
-
-服务实例所绑定的IP
- 
-#### port
-
-服务实例所监听的端口 
-
-#### protocol
-
-服务实例所监听的端口的协议
-
-#### version 
-
-服务实例的版本 
-
-#### weight
-
-服务实例的权重
-
-#### healthy 
-
-服务实例的健康状态 
-
-#### isolate 
-
-服务实例的隔离状态，当实例的隔离状态被开启时
-
-#### location
-
-服务实例的地理位置信息
-
-#### metadata
-
-服务实例的元数据信息，可以用于存储实例的分组信息、流量标签等
+```yaml
+kind: Instance
+metadata:
+  namespace:
+  service:
+spec:
+  # Health check
+  checker:
+    # Name of health check strategy
+    name: 
+  instance:
+    # Instance IP information
+    host:
+    # listen port
+    port:
+    # Port protocol
+    protocol:
+    # weight information
+    weight:
+    # health status identification
+    healthy:
+    # When an instance is isolated, the state is true, and any 
+    # request cannot be routed to this example.
+    isolate:
+    # The version information of the instance is mainly used for version routing
+    version:
+    # Geographic location information is mainly used to close the route
+    location:
+      region:
+      zone:
+      campus:
+    # Instance label, store metadata information related to this instance
+    labels:
+      - key:
+        value:
+      - key:
+        value: 
+```
