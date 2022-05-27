@@ -1,1 +1,5 @@
-# Fault detector（故障探测）
+# Fault detector
+
+English| [简体中文](./faultdetector-zh.md) 
+
+---

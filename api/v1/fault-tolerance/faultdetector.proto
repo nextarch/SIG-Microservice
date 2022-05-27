@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package faulttolerance;
+
+option go_package = "api/v1/faulttolerance";
+option java_package = "cn.polarismesh.polaris.faulttolerance";

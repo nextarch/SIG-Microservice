@@ -1,0 +1,241 @@
+syntax = "proto3";
+
+package accesscontrol;
+
+option go_package = "api/v1/accesscontrol";
+option java_package = "cn.polarismesh.polaris.accesscontrol";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/duration.proto";
+
+// Set of all rate limiting rules for the service
+message RateLimit {
+  // Set of limiting rules
+  repeated Rule rules = 1;
+  // The revision information summarized by the rate limiting rules
+  google.protobuf.StringValue revision = 2;
+}
+
+//Rate limiting rule specification
+message Rule {
+  // The unique identifier of the rate limiting rule
+  google.protobuf.StringValue id = 1;
+  // The name of the service to which the rate limiting rule belongs
+  google.protobuf.StringValue service = 2;
+  // The namespace to which the rate limiting rule belongs
+  google.protobuf.StringValue namespace = 3;
+  // Optional, SUBSET identifier
+  map<string, MatchString> subset = 4;
+  // The priority of the rate limiting rule, the value of 0 is the highest
+  google.protobuf.UInt32Value priority = 5;
+  // Rate limiting resource type
+  ResourceType resource = 6;
+  // Rate limit type
+  Type type = 7;
+  // The set of request labels, which are matched by key/value, and this rule is used only when all labels are matched.
+  map<string, MatchString> labels = 8;
+  // Rate limiting threshold
+  // There can be multiple granularity configurations (for example, for seconds, minutes, and days at the same time)
+  // In the global rate limiting mode, the value is the total amount of service quota;
+  // in the stand-alone rate limiting mode, the value is the quota amount that a single node can handle
+  repeated Amount amounts = 9;
+  // The rate limiting action corresponds to the plugin name of the client.
+  // For example, reject the request
+  google.protobuf.StringValue action = 10;
+  // Whether to enable the rate limiting rule, enabled by default
+  google.protobuf.BoolValue disable = 11;
+  // In distributed current limiting mode, each node reports quota policy
+  ReportPolicy report = 12;
+  // Rate limit rule creation time
+  google.protobuf.StringValue ctime = 13;
+  // Rate limit rule modification time
+  google.protobuf.StringValue mtime = 14;
+  // Rate limiting rule revision
+  google.protobuf.StringValue revision = 15;
+  // The TOKEN of the service is only used for the console, and the discover interface does not deliver it.
+  google.protobuf.StringValue service_token = 16 [json_name = "service_token"];
+  // Amount adjustment algorithm
+  AmountAdjusterAlgorithm adjuster = 17;
+  // Whether wildcards are combined and counted, the default counts separately
+  google.protobuf.BoolValue regex_combine = 18;
+  // Rate Limiting amount mode
+  AmountMode amount_mode = 19;
+  // Degradation policy when failed to obtain rate limiting rules from the control plane
+  FailoverType failover = 20;
+  // Distributed rate limiting service cluster information
+  RateLimitCluster cluster = 21;
+  // Called method name
+  MatchString method = 22;
+}
+
+// Match regular expression
+message MatchString {
+  // Match type
+  enum MatchStringType {
+    // Exact match
+    EXACT = 0;
+    // Regex math
+    REGEX = 1;
+	// Not equals match
+	NOT_EQUALS = 2;
+	// Include match
+	INCLUDE = 3;
+	// Not include match
+	NOT_INCLUDE = 4;
+  }
+
+  enum ValueType {
+    TEXT = 0;
+  }
+
+  MatchStringType type = 1;
+  google.protobuf.StringValue value = 2;
+}
+
+// Rate limiting resources
+enum ResourceType {
+  // Access request
+  QPS = 0;
+  // Concurrent threads handling requests
+  CONCURRENCY = 1;
+}
+
+// Rate limiting type
+enum Type {
+  //Global rate limiting, cluster rate limiting, distributed rate limiting
+  GLOBAL = 0;
+  //Stand-alone rate limiting
+  LOCAL = 1;
+}
+
+// Rate limiting quota
+message Amount {
+  // Maximum number of quotas in a time period
+  google.protobuf.UInt32Value maxAmount = 1;
+  // The time period during which the quota takes effect, which must be greater than or equal to 1 s
+  google.protobuf.Duration validDuration = 2;
+  // Request statistical precision ?
+  google.protobuf.UInt32Value precision = 3;
+  // Optional, start current limit threshold, start value of ramp
+  google.protobuf.UInt32Value startAmount = 4;
+  // Optional, minimum current limit threshold, minimum when decreasing
+  google.protobuf.UInt32Value minAmount = 5;
+}
+
+// In distributed current limiting mode, each node reports quota policy
+message ReportPolicy {
+  // Fixed quota reporting period, in milliseconds
+  google.protobuf.Duration interval = 1;
+  // Start a real-time report after the percentage of quota used, the value range (0,100]
+  google.protobuf.UInt32Value amountPercent = 2;
+}
+
+// Amount adjustment algorithm
+message AmountAdjusterAlgorithm {
+  ClimbConfig climb = 1;
+}
+
+// Rate limiting adjustment algorithm climb related configuration
+message ClimbConfig {
+  // The switch whether to enable amount adjustment
+  google.protobuf.BoolValue enable = 1;
+
+  // Rate limiting data statistics configuration
+  message MetricConfig {
+    // Rate limit data measurement period, default 60 s
+    google.protobuf.Duration window = 1;
+    // The statistical precision of the data, which determines the minimum period of the data measurement,
+    // the step size of the measurement sliding window = window/precision
+    google.protobuf.UInt32Value precision = 2;
+    // Reporting period, the default is 20 s
+    google.protobuf.Duration reportInterval = 3;
+  }
+  MetricConfig metric = 2;
+
+  // Strategies that trigger adjustments
+  message TriggerPolicy {
+    // Error rate trigger adjustment configuration
+    message ErrorRate {
+      //Whether to enable
+      google.protobuf.BoolValue enable = 1;
+      // Minimum number of requests to trigger throttling adjustment
+      google.protobuf.UInt32Value requestVolumeThreshold = 2;
+      // Error rate that triggers current limiting
+      google.protobuf.Int32Value errorRate = 3;
+
+      // Special error code trigger adjustment configuration
+      message SpecialConfig {
+        // Custom error type
+        google.protobuf.StringValue type = 1;
+        // Error codes targeted by specific rules
+        repeated google.protobuf.Int64Value errorCodes = 2;
+        // Specific rule error rate
+        google.protobuf.Int32Value errorRate = 3;
+      }
+      // For some error codes, additional error rate statistics can be used, and multiple sets of special rules can be set
+      repeated SpecialConfig specials = 4;
+    }
+    // Slow call triggers adjustment configuration
+    message SlowRate {
+      //Whether to enable
+      google.protobuf.BoolValue enable = 1;
+      // The maximum response time, exceeding the response time is a slow call
+      google.protobuf.Duration maxRt = 2;
+      // Slow request rate threshold, when this threshold is reached, current limiting
+      google.protobuf.Int32Value slowRate = 3;
+    }
+    // Adjusted by error rate threshold
+    ErrorRate errorRate = 1;
+    // Slow call for trigger adjustment
+    SlowRate slowRate = 2;
+  }
+  // Trigger adjustment strategy
+  TriggerPolicy policy = 3;
+
+  // Climb adjustment related parameters
+  message ClimbThrottling {
+    // Percent reduction in the range below the cold water level
+    google.protobuf.Int32Value coldBelowTuneDownRate = 1;
+    // Upward percentage of range below cold water level
+    google.protobuf.Int32Value coldBelowTuneUpRate = 2;
+    // Percent reduction in range above cold water level
+    google.protobuf.Int32Value coldAboveTuneDownRate = 3;
+    // Upward percentage of range above cold water level
+    google.protobuf.Int32Value coldAboveTuneUpRate = 4;
+    // Above the cold water level, the threshold will be raised after requests exceeding this percentage are throttled
+    google.protobuf.Int32Value limitThresholdToTuneUp = 5;
+    // Decision interval for threshold adjustment rules
+    google.protobuf.Duration judgeDuration = 6;
+    // The number of cycles for the threshold to be raised, and the upward adjustment is performed only after N consecutive decision intervals are raised
+    google.protobuf.Int32Value tuneUpPeriod = 7;
+    // The number of cycles of threshold down-regulation, the down-regulation is performed only after N consecutive decision-making intervals are down-regulation
+    google.protobuf.Int32Value tuneDownPeriod = 8;
+  }
+
+  // Current limiting adjustment related parameters
+  ClimbThrottling throttling = 4;
+}
+
+// The mode of amount
+enum AmountMode {
+  // Overall threshold
+  GLOBAL_TOTAL = 0;
+  // Amortized threshold for single node
+  SHARE_EQUALLY = 1;
+}
+
+// The failover type
+enum FailoverType {
+  // Downgrade using local rate limiting rules
+  FAILOVER_LOCAL = 0;
+  // downgrade to direct pass
+  FAILOVER_PASS = 1;
+}
+
+// Distributed rate limiting service cluster
+message RateLimitCluster {
+  // The service to which the rate limiting cluster belongs
+  google.protobuf.StringValue service = 1;
+  // The namespace to which the rate limiting cluster belongs
+  google.protobuf.StringValue namespace = 2;
+}

@@ -1,13 +1,5 @@
 # Namespace
 
-```yaml
-kind: Namespace
-metadata:
-  name:
-spec:
-  labels:
-    - key:
-      value:
-    - key:
-      value:
-```
+English| [简体中文](./namespace-zh.md) 
+
+---

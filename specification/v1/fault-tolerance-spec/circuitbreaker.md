@@ -1,56 +1,5 @@
-# Circuit breaker（熔断降级）
+# Circuit breaker
 
-```yaml
-kind: Circuitbreaker
-metadata:
-  name: default
-  namespace:
-  service:
-  interface:
-spec:
-  type: outbound
-  destination:
-  - namespace:
-    service:
-    interface:
-  - namespace:
-    service:    
-    interface:
-  match:
-  - key: error
-    durdsdds:
-    throusdd:
-  - key: dsdd
-    throusdd:
-    dsdasdad:
-  halfOpen:
-    du
-  faultDetector: name
-```
+English| [简体中文](./circuitbreaker-zh.md) 
 
-```yaml
-kind: Circuitbreaker
-metadata:
-  name: default
-  namespace:
-  service:
-spec:
-  type: outbound
-  destination:
-  - namespace:
-    service:
-    interface:
-  - namespace:
-    service:    
-    interface:
-  match:
-  - key: error
-    durdsdds:
-    throusdd:
-  - key: dsdd
-    throusdd:
-    dsdasdad:
-  halfOpen:
-    du
-  faultDetector: name
-```
+---

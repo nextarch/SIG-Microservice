@@ -1,30 +1,5 @@
 # Service
 
-```yaml
-kind: Service
-metadata:
-  name:
-  namespace:
-spec:
-  labels:
-  - key:
-    value:
-  - key:
-    value:
-  ports:
-  - protocol:
-    port:
-  - protocol:
-    port:
-```
+English| [简体中文](./service-zh.md) 
 
-```yaml
-kind: ServiceAlias
-metadata:
-  name:
-  namespace:
-spec:
-  targetService:
-    name:
-    namespace:
-```
+---

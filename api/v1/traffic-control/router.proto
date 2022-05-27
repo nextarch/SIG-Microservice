@@ -1,17 +1,77 @@
 syntax = "proto3";
 
-package v1;
+package trafficcontrol;
+
+option go_package = "api/v1/trafficcontrol";
+option java_package = "cn.polarismesh.polaris.trafficcontrol";
 
 import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+
+// configuration root for route
+message Routing {
+    // Rule belongs and namespace
+    google.protobuf.StringValue namespace = 1;
+    google.protobuf.StringValue service = 2;
+
+    // Each service can configure multiple inbound or outbound rules
+    // For each request, you can match from top to bottom, if you are in the
+    // middle, terminate
+	// For compatible only
+    repeated Route inbounds = 3;
+	// For compatible only
+    repeated Route outbounds = 4;
+
+	google.protobuf.StringValue ctime = 5;
+	google.protobuf.StringValue mtime = 6;
+	google.protobuf.StringValue revision = 7;
+
+	google.protobuf.StringValue service_token = 8 [json_name="service_token"];
+
+	google.protobuf.StringValue id = 9;
+
+    // Routers chain
+    repeated Router routers = 10;
+	
+	// Failover config for routers
+    FailoverConfig failover = 11;
+}
+
+enum RoutingPolicy {
+	// Route by rule rule
+	RulePolicy = 0;
+	// Route by destination metadata
+	MetadataPolicy = 1;
+	// Route by nearby locality
+	LocalityPolicy = 2;
+}
+
+// router configuration
+message Router {
+    // Enable this router
+    google.protobuf.BoolValue enable = 1;
+	
+	// Router type
+	RoutingPolicy routing_policy = 2;
+	
+	// Routing configuration for router
+	google.protobuf.Any routing_config = 3;
+}
 
 // MatchString
 message MatchString {
   enum MatchStringType {
 
-    // equivalent match
+    // Equivalent match
     EXACT = 0;
-    // regular match
+    // Regular match
     REGEX = 1;
+	// Not equals match
+	NOT_EQUALS = 2;
+	// Include match
+	INCLUDE = 3;
+	// Not include match
+	NOT_INCLUDE = 4;
   }
 
   enum ValueType {
@@ -33,16 +93,38 @@ message MatchString {
   ValueType value_type = 3;
 }
 
-message Routing {
-  // Rule belongs and namespace
-  google.protobuf.StringValue namespace = 1;
-  google.protobuf.StringValue service = 2;
+// Locality for service instance
+message Locality {
+	// Region this zone belongs to
+	MatchString region = 1;
+	// Local zone where campus belongs to
+	MatchString zone = 2;
+	// Campus for the instance hosting
+	MatchString campus = 3;
+}
 
+message FailoverConfig {
+	// Enable degrade
+	google.protobuf.BoolValue enable = 1;
+	
+	// Degrade by left instance total
+	google.protobuf.UInt32Value total_count = 2;
+	
+	// Degrade by healthy instance total
+	google.protobuf.UInt32Value healthy_count = 3;
+	
+	// Degrade by healthy instance precent
+	google.protobuf.UInt32Value healthy_percent = 4;
+}
+
+
+// Routing by rules
+message RuleRoutingConfig {
   // Each service can configure multiple inbound or outbound rules
   // For each request, you can match from top to bottom, if you are in the
   // middle, terminate
-  repeated Route inbounds = 3;
-  repeated Route outbounds = 4;
+  repeated Route inbounds = 1;
+  repeated Route outbounds = 2;
 }
 
 message Route {
@@ -60,6 +142,9 @@ message Source {
   // Master Control Service Example Tag or Request Label
   // Value supports regular matching
   map<string, MatchString> metadata = 3;
+  
+  // Locality info for caller service
+  Locality locality = 4;
 }
 
 message Destination {
@@ -90,4 +175,35 @@ message Destination {
 
   // Whether to isolate the SET, after isolation, no traffic will be allocated
   google.protobuf.BoolValue isolate = 7;
+  
+  // Locality info for destination
+  Locality locality = 8;
+}
+
+message LocalityRoutingConfig {
+	
+	enum LocalityLevel {
+		CAMPUS = 0;
+		ZONE = 1;
+		REGION = 2;
+		ALL = 3;
+	}
+	
+	// Starting locality level
+	LocalityLevel locality_level = 1;
+	
+	// When failover, the router will down to match higher level, here define the max failover level
+	LocalityLevel max_locality_level = 2;
+}
+
+message MetadataRoutingConfig {
+	
+	enum FailoverRange {
+	   ALL = 0;
+	   OTHERS = 1;
+	   OTHER_KEYS = 2;
+	}
+	
+	// When metadata not found, it will fall back to the 
+	FailoverRange failover_range = 1;
 }

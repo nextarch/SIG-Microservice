@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package accesscontrol;
+
+option go_package = "api/v1/accesscontrol";
+option java_package = "cn.polarismesh.polaris.accesscontrol";

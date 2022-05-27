@@ -1,6 +1,9 @@
 syntax = "proto3";
 
-package v1;
+package service;
+
+option go_package = "api/v1/service";
+option java_package = "cn.polarismesh.polaris.service";
 
 import "google/protobuf/wrappers.proto";
 
