@@ -50,6 +50,7 @@ Microservice SIG is committed to providing a standardized service governance sol
 | Bo Zhang                    | BIGO      |
 | Baohui Wei, Bin Fan         | China Mobile Information |
 | Guoguang Hu                 | Aspire |
+| Ming Shi                    | Meetsocial Group |
 | Jiajun Shan, Chuntao Liao   | [Polaris](https://github.com/polarismesh) |
 | Shun Song                   | [Apollo](https://github.com/apolloconfig) |
 | Junfeng Wan                 | [go-zero](https://github.com/zeromicro)   |
