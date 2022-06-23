@@ -56,13 +56,12 @@
 
 ## 属性
 
-| 名称            | 类型           | 描述               | 是否必选 |
-| --------------- | -------------- | ------------------ | -------- |
-| namespace       | string         | 规则所属的命名空间 | 是       |
-| service         | string         | 规则所属的服务     | 是       |
-| lb_policy       | enum           | 负载均衡策略       | 是       |
-| ringhash_config | RingHashConfig | 环一致性hash配置   | 否       |
-| maglev_confgi   | MaglevConfig   | maglev算法配置     | 否       |
+| 名称      | 类型   | 描述                                   | 是否必选 |
+| --------- | ------ | -------------------------------------- | -------- |
+| namespace | string | 规则所属的命名空间                     | 是       |
+| service   | string | 规则所属的服务                         | 是       |
+| lb_policy | enum   | 负载均衡策略                           | 是       |
+| lb_config | any    | 负载均衡的配置，如果不填则使用默认配置 | 否       |
 
 
 

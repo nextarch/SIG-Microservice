@@ -78,10 +78,10 @@ message MatchString {
     REGEX = 1;
     // Not equals match
     NOT_EQUALS = 2;
-    // Include match
-    INCLUDE = 3;
+    // Contains match
+    CONTAINS = 3;
     // Not include match
-	NOT_INCLUDE = 4;
+	NOT_CONTAINS = 4;
   }
 
   enum ValueType {
