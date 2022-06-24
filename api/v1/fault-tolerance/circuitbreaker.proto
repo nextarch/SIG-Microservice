@@ -7,6 +7,7 @@ option java_package = "cn.polarismesh.polaris.faulttolerance";
 
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/any.proto";
 
 // MatchString
 message MatchString {
@@ -24,131 +25,85 @@ message MatchString {
 	NOT_CONTAINS = 4;
   }
 
-  enum ValueType {
-    // Routing rules write dead data  
-    TEXT = 0;
-  }
-
   // Matching rule
   MatchStringType type = 1;
 
   // Routing rules
-  google.protobuf.StringValue value = 2;
+  string value = 2;
 }
 
-message CircuitBreaker {
-  google.protobuf.StringValue id = 1;
-  // Rule name
-  google.protobuf.StringValue name = 2;
-  // Rule namespace
-  google.protobuf.StringValue namespace = 3;
+message RuleMatcher {
 
-  // Rule service and service namespace
-  google.protobuf.StringValue service = 4;
-  google.protobuf.StringValue service_namespace = 5;
-
-  repeated CbRule inbounds = 6;
-  repeated CbRule outbounds = 7;
-
-  google.protobuf.StringValue comment = 8;
-  google.protobuf.StringValue ctime = 9;
-  google.protobuf.StringValue mtime = 10;
-  google.protobuf.StringValue revision = 11;
-}
-
-message SourceMatcher {
-  // Caller service and namespace，* is for match all
-  google.protobuf.StringValue service = 1;
-  google.protobuf.StringValue namespace = 2;
-}
-
-// Recover config for cuicuitbreaking
-message RecoverConfig {
-  // Sleep interval for open to halfopen
-  google.protobuf.Duration sleepWindow = 1;
-  // Max retry count to recover
-  google.protobuf.UInt32Value maxRetryAfterHalfOpen = 2;
-  // Max request percent to recover
-  repeated google.protobuf.UInt32Value requestRateAfterHalfOpen = 3;
-  // Success rate to recover request
-  google.protobuf.UInt32Value successRateToClose = 4;
-  // Max request for after halfopen
-  google.protobuf.UInt32Value requestCountAfterHalfOpen = 5;
-  // Active detect config
-  enum OutlierDetectWhen {
-    // No active detect
-    NEVER = 0;
-    // Active detect when circuitbreaker open
-    ON_RECOVER = 1;
-    // Always do active detect
-    ALWAYS = 2;
-  }
-  OutlierDetectWhen outlierDetectWhen = 6;
-}
-
-message CbPolicy {
-  // ErrRate circuitbreaker config
-  message ErrRateConfig {
-    // Enable circuitbreak by errorRate
-    google.protobuf.BoolValue enable = 1;
-    google.protobuf.UInt32Value requestVolumeThreshold = 2;
-    google.protobuf.UInt32Value errorRateToPreserved = 3;
-    google.protobuf.UInt32Value errorRateToOpen = 4;
-    message SpecialConfig {
-	  google.protobuf.StringValue	type = 1;
-      repeated google.protobuf.Int64Value errorCodes = 2;
-      google.protobuf.UInt32Value errorRateToPreserved = 3;
-      google.protobuf.UInt32Value errorRateToOpen = 4;
-    }
-    repeated SpecialConfig specials = 5;
-  }
-  ErrRateConfig errorRate = 1;
-  // SlowRate circuitbreaker config
-  message SlowRateConfig {
-    google.protobuf.BoolValue enable = 1;
-    google.protobuf.Duration maxRt = 2;
-    google.protobuf.UInt32Value slowRateToPreserved = 3;
-    google.protobuf.UInt32Value slowRateToOpen = 4;
-  }
-  SlowRateConfig slowRate = 2;
-  google.protobuf.Duration judgeDuration = 3;
-  google.protobuf.UInt32Value maxEjectionPercent = 4;
-  // Consecutive errorRate circuitBreaker config
-  message ConsecutiveErrConfig {
-    google.protobuf.BoolValue enable = 1;
-    google.protobuf.UInt32Value consecutiveErrorToPreserved = 2;
-    google.protobuf.UInt32Value consecutiveErrorToOpen = 3;
-  }
-  ConsecutiveErrConfig consecutive = 5;
-}
-
-// 目标set的规则
-message DestinationSet {
-  // Callee namespace and service
-  google.protobuf.StringValue service = 1;
-  google.protobuf.StringValue namespace = 2;
-  reserved 3;
+  map<string, string> sourceLabels = 1;
   
-  // Resource to circuitbreak
-  enum Resource {
-    SUBSET = 0;
-    INSTANCE = 1;
-  }
-  Resource resource = 4;
+  string destinationService = 2;
   
-  reserved 5 to 9;
-
-  // Recover config when open
-  RecoverConfig recover = 10;
-
-  CbPolicy policy = 11;
-
-  // Callee method name
-  MatchString method = 12;
+  string destinationNamespace = 3;
 }
 
-message CbRule {
-  // Use destination rules when one of the sources is matched
-  repeated SourceMatcher sources = 1;
-  repeated DestinationSet destinations = 2;
+
+// main rule for circuitbreaking
+message CircuitBreakerRule {
+  //rule name
+  string name = 1;
+  
+  // match condition 
+  RuleMatcher match = 2;
+  
+  // circuitbreak to level
+  enum Level {
+	// service level circuitbreaking
+    SERVICE = 0;
+    // method level circuitbreaking
+    METHOD = 1;
+	// group level circuitbreaking
+    GROUP = 2;
+    // instance level circuitbreaking
+    INSTANCE = 3;
+  }
+  repeated Level levels = 3;
+  
+  // circuitbreak policy
+  enum Policy {
+    FAIL_FAST = 0;
+	THROTTING = 1;
+  }
+  Policy policy = 4;
+  
+  // circuitbreak policy detail config
+  google.protobuf.Any policyConfig = 5;
+}
+
+message FailFastConfig {
+
+  uint32 protectThreshold = 1;
+  
+  uint32 errorRatioThreshold = 2;
+
+  uint32 consecutiveErrorThreshold = 3;
+  
+  uint32 errorCountThreshold = 4;
+  
+  uint32 slowRatioThreshold = 5;
+  
+  uint32 maxDelay = 6;
+  
+  uint32 sleepWindow = 7;
+  
+  uint32 statInteval = 8;
+  
+  uint32 statBucket = 9;
+  
+  uint32 recoverRatio = 10;
+}
+
+message ThrottingConfig {
+  
+  uint32 protectThreshold = 1;  
+  
+  uint32 keyFactor = 2;
+
+  uint32 statInteval = 3;
+  
+  uint32 statBucket = 4;  
 }
