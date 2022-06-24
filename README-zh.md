@@ -16,22 +16,22 @@ README：
 
 ## 标准化
 
-|                                   |         Latest Release             |  
+|                                   |         Latest Release             |
 | :-------------------------------- | :--------------------------------: |
 | **Serivce Specification**         |
-| namespace       | [v1alpha1](/specification/v1/service-spec/namespace.md) |
-| service         | [v1alpha1](/specification/v1/service-spec/service.md) |
-| instance        | [v1alpha1](/specification/v1/service-spec/instance.md) |
-| health check    | [v1alpha1](/specification/v1/service-spec/healthcheck.md) |
+| namespace       | [v1alpha1](/specification/v1/service-spec/namespace-zh.md) |
+| service         | [v1alpha1](/specification/v1/service-spec/service-zh.md) |
+| instance        | [v1alpha1](/specification/v1/service-spec/instance-zh.md) |
+| health check    | [v1alpha1](/specification/v1/service-spec/healthcheck-zh.md) |
 | **Traffic Control Specification** |
-| router          | [v1alpha1](/specification/v1/traffic-control-spec/router.md) |
-| load balancer   | [v1alpha1](/specification/v1/traffic-control-spec/loadbalancer.md) |
+| router          | [v1alpha1](/specification/v1/traffic-control-spec/router-zh.md) |
+| load balancer   | [v1alpha1](/specification/v1/traffic-control-spec/loadbalancer-zh.md) |
 | **Fault Tolerance Specification** |
-| circuit breaker | [v1alpha1](/specification/v1/fault-tolerance-spec/circuitbreaker.md) |
-| fault detector  | [v1alpha1](/specification/v1/fault-tolerance-spec/faultdetector.md) |
+| circuit breaker | [v1alpha1](/specification/v1/fault-tolerance-spec/circuitbreaker-zh.md) |
+| fault detector  | [v1alpha1](/specification/v1/fault-tolerance-spec/faultdetector-zh.md) |
 | **Access Control Specification**  |
-| limiter         | [v1alpha1](/specification/v1/access-control-spec/limiter.md) |
-| authentication  | [v1alpha1](/specification/v1/access-control-spec/authentication.md) |
+| limiter         | [v1alpha1](/specification/v1/access-control-spec/limiter-zh.md) |
+| authentication  | [v1alpha1](/specification/v1/access-control-spec/authentication-zh.md) |
 
 ## 生态系统
 

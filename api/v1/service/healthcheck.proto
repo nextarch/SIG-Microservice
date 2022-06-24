@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package service;
+
+option go_package = "/api/v1/service";
+option java_package = "cn.polarismesh.polaris.service";
