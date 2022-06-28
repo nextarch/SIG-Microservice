@@ -18,7 +18,7 @@ Microservice SIG is committed to providing a standardized service governance sol
 
 ## Specification
 
-|                                   |         Latest Release             |  
+|                                   |         Latest Release             |
 | :-------------------------------- | :--------------------------------: |
 | **Serivce Specification**         |
 | namespace       | [v1alpha1](/specification/v1/service-spec/namespace.md) |
@@ -59,6 +59,7 @@ Microservice SIG is committed to providing a standardized service governance sol
 | Le Zhang, Haotian Zhang     | [Spring Cloud Tencent](https://github.com/Tencent/spring-cloud-tencent) |
 | Kaiyuan Li                  | [TARS](https://github.com/TarsCloud) |
 | Zilong Tong, Zhixin Liu     | [Femas](https://github.com/polarismesh/femas) |
+| GuoLiang Cao, ZhiHui Chen | [go-kratos](https://github.com/go-kratos) |
 
 ## SIG Responsibilities
 

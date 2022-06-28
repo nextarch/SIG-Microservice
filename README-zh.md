@@ -56,5 +56,6 @@ README：
 | Le Zhang, Haotian Zhang     | [Spring Cloud Tencent](https://github.com/Tencent/spring-cloud-tencent) |
 | Kaiyuan Li                  | [TARS](https://github.com/TarsCloud) |
 | Zilong Tong, Zhixin Liu     | [Femas](https://github.com/polarismesh/femas) |
+| GuoLiang Cao, ZhiHui Chen | [go-kratos](https://github.com/go-kratos) |
 
 ## SIG 职责
