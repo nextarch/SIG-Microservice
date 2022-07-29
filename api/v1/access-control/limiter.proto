@@ -24,7 +24,7 @@ message Rule {
   string namespace = 2;
 
   // Whether to enable the rate limiting rule, enabled by default
-  bool disable = 3;
+  bool disabled = 3;
 
   // Rate limit type
   LimitType limit_type = 4;
