@@ -6,35 +6,88 @@ option go_package = "api/v1/trafficcontrol";
 option java_package = "cn.polarismesh.polaris.trafficcontrol";
 
 import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+
+// FlowStaining 流量染色
+message FlowStaining {
+  string id = 10;
+  // flow statining rule name
+  string name = 2;
+  //
+  repeated StaineRule rules = 3;
+}
+
+message StaineRule {
+  // Traffic matching rules
+  repeated SourceMatch arguments = 1;
+  // Staining label
+  repeated StaineLabel labels = 2;
+  // Stain Label
+  uint32 priority = 3;
+  // rule is enabled
+  bool enable = 4;
+  // Set the percentage of traffic that needs to be dyed
+  uint32 stainePercent = 5;
+}
+
+message StaineLabel {
+  string Key = 1;
+  string Value = 2;
+}
+
+enum RoutingPolicy {
+  // Route by rule rule => RuleRoutingConfig
+  RulePolicy = 0;
+  // Route by destination metadata
+  MetadataPolicy = 1;
+}
 
 // configuration root for route
 message Routing {
-  // Rule belongs and namespace
-  string namespace = 1;
-  string service = 2;
-
-  // Each service can configure multiple inbound or outbound rules
-  // For each request, you can match from top to bottom, if you are in the
-  // middle, terminate
-  // For compatible only
-  repeated Route inbounds = 3;
-  // For compatible only
-  repeated Route outbounds = 4;
-
-  string revision = 7;
-
-  string id = 10;
-
+  string id = 1;
   // route rule name
-  string name = 11;
+  string name = 2;
+  // namespace 路由规则所属的命名空间
+  string namespace = 3;
+  // Enable this router
+  google.protobuf.BoolValue enable = 4;
+  // Router type
+  RoutingPolicy routing_policy = 5;
+  // Routing configuration for router
+  google.protobuf.Any routing_config = 6;
+  // revision 当前路由规则的版本信息
+  string revision = 7;
 }
 
-message Route {
+message MetadataFailover {
+  enum FailoverRange {
+    // ALL 直接返回全部实例
+    ALL = 0;
+    // OTHERS 返回没有这些标签的实例
+    OTHERS = 1;
+    // OTHER_KEYS 根据另外一组标签进行筛选
+    OTHER_KEYS = 2;
+  }
+  // 元数据路由兜底类型
+  FailoverRange failover_range = 1;
+  // 仅仅用于 failover_range == OTHER_KEYS 时生效
+  map<string, string> labels = 2;
+}
+
+// MetadataRoutingConfig 元数据路由配置
+message MetadataRoutingConfig {
+  map<string, string> labels = 1;
+  // When metadata not found, it will fall back to the
+  MetadataFailover failover = 2;
+}
+
+// RuleRoutingConfig 规则路由配置
+message RuleRoutingConfig {
   // If you match the Source rule, follow the Destination route
   // The relationship between multiple SOURCE is or
-  repeated Source sources = 1;
-  // 
-  repeated Destination destinations = 2;
+  Source source = 1;
+  //
+  Destination destination = 2;
 }
 
 message Source {
@@ -44,7 +97,7 @@ message Source {
 
   // Master Control Service Example Tag or Request Label
   // Value supports regular matching
-  repeated MatchArgument arguments = 3;
+  repeated SourceMatch arguments = 3;
 }
 
 message Destination {
@@ -67,17 +120,14 @@ message Destination {
   // priority is not set. If the part is set, some is not set, it is considered
   // that the weight is not set to 0 If you have no weight, you think the weight
   // is the same
-  google.protobuf.UInt32Value priority = 4;
-  google.protobuf.UInt32Value weight = 5;
+  uint32 priority = 4;
+  uint32 weight = 5;
 
   // Forward requests to proxy service
   string transfer = 6;
 
   // Whether to isolate the SET, after isolation, no traffic will be allocated
   bool isolate = 7;
-
-  // Locality info for destination
-  LocalityRoutingConfig locality = 8;
 }
 
 // MatchString
@@ -103,18 +153,15 @@ message MatchString {
     // Routing rules write dead data
     TEXT = 0;
   }
-
   // Matching rule
   MatchStringType type = 1;
-
   // Routing rules
   string value = 2;
-
   // Value type, specific acquisition path for routing rule values
   ValueType value_type = 3;
 }
 
-message MatchArgument {
+message SourceMatch {
   // label type for gateway request
   enum Type {
     // custom arguments
@@ -125,50 +172,12 @@ message MatchArgument {
     HEADER = 2;
     // query, match the http query, dubbo argument
     QUERY = 3;
-    // caller service
-    CALLER_SERVICE = 4;
     // caller host ip
-    CALLER_IP = 5;
+    CALLER_IP = 4;
   }
   Type type = 1;
   // header key or query key
   string key = 2;
   // header value or query value
   MatchString value = 3;
-}
-
-message FailoverConfig {
-  // Enable degrade
-  bool enable = 1;
-
-  // Degrade by left instance total
-  uint32 total_count = 2;
-
-  // Degrade by healthy instance total
-  uint32 healthy_count = 3;
-
-  // Degrade by healthy instance precent
-  uint32 healthy_percent = 4;
-}
-
-message LocalityRoutingConfig {
-
-  enum LocalityLevel {
-    CAMPUS = 0;
-    ZONE = 1;
-    REGION = 2;
-    ALL = 3;
-  }
-
-  // Starting locality level
-  LocalityLevel locality_level = 1;
-  // When failover, the router will down to match higher level, here define the
-  // max failover level
-  LocalityLevel max_locality_level = 2;
-  // Whether to allow the nearest route downgrade according to different health levels
-  bool enableDegradeByUnhealthyPercent = 3;
-  // Sets the percentage of unhealthy instances that trigger the nearest route matching downgrade
-  bool unhealthyPercentToDegrade = 4;
-  // Enable degrade
-  bool enable = 5;
 }

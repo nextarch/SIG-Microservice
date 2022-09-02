@@ -134,32 +134,34 @@ spec:
 
 #### 网关染色
 
-> 静态染色
-
-- 在不同的环境中，都独立部署了一套网关
-- 在每个网关中，都有一个流量染色插件，该插件是静态染色
-- 所有经过这个网关的流量，都会被插件自动注入当前网关所设置的流量标签
-
-![image.png](https://cdn.nlark.com/yuque/0/2022/png/333972/1660880839474-03bda21c-0bb3-4093-9fc1-117d3a57e905.png#clientId=ub7c4a5af-3374-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=1150&id=uafe86729&margin=%5Bobject%20Object%5D&name=image.png&originHeight=1150&originWidth=1084&originalType=binary&ratio=1&rotation=0&showTitle=false&size=439474&status=done&style=none&taskId=u209ccc7e-3740-4a04-aa96-49aa175b3b8&title=&width=1084)
-
 > 动态染色
 
 - 所有环境都公用同一套网关集群
-- 网关有一个流量染色插件
-- 该染色插件会解析流量的相关信息，并根据配置的流量染色规则，为当前流量打上符合规则的相关流量标签
+- 网关去实现流量染色的能力
+- 在网关层会解析流量的相关信息，并根据配置的流量染色规则，为当前流量打上符合规则的相关流量标签，规则主要有以下两类
+  - 条件染色：根据规则计算，得出当前流量应该打上的染色标签信息
+  - 随机染色
+    - 直接对流量随机染色
+    - 先对流量进行规则匹配，对满足匹配规则流量再继续随机染色
 
 ![image.png](https://cdn.nlark.com/yuque/0/2022/png/333972/1660880986728-abecb816-fffb-4649-bd4a-44b45b41f3f6.png#clientId=ub7c4a5af-3374-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=1158&id=u6901e424&margin=%5Bobject%20Object%5D&name=image.png&originHeight=1158&originWidth=1166&originalType=binary&ratio=1&rotation=0&showTitle=false&size=410318&status=done&style=none&taskId=u82cf9404-5f4c-4427-bcae-c4301682f85&title=&width=1166)
 
-#### 客户端染色
+#### 主调方染色
 
 - 在部署应用实例时，直接设定了在当前环境下这个实例所有发送的请求携带的相关流量标签
-  - 需要客户端在所有发送请求的地方，注入相关特定的流量标签
+  - 需要主调方在所有发送请求的地方，注入相关特定的流量标签
 
 ![image.png](https://cdn.nlark.com/yuque/0/2022/png/333972/1660879677396-6b1c1ebe-204f-4196-9277-4107752ae9f8.png#clientId=ub7c4a5af-3374-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=1054&id=u95d8b337&margin=%5Bobject%20Object%5D&name=image.png&originHeight=1054&originWidth=1088&originalType=binary&ratio=1&rotation=0&showTitle=false&size=387057&status=done&style=none&taskId=u256d2b3d-d339-4809-b79f-91b5c38e9ce&title=&width=1088)
 
 ### 标签透传 
 
-#### 语言原生实现
+#### 跨进程间标签传递
+
+// TODO 附件能力
+
+#### 进程内标签传递
+
+我们约定所有的流量标签均已 <Key, Value> 的形式进行传递
 
 > Java 语言生态
 
@@ -183,7 +185,7 @@ spec:
 
 #### 借助 opentelemetry（较为推荐，无需再做重复的事情）
 
-- 利用 tracing 的能力，将标签信息已 <Key, Value> 的形式， 放在名称为 io.microservice.traffic-labels 的 Baggage 中
+- 利用 tracing 的能力，将标签信息放在名称为 io.microservice.traffic-labels 的 Baggage 中
 
 # 场景化支持
 
