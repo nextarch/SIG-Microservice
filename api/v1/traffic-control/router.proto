@@ -6,155 +6,55 @@ option go_package = "api/v1/trafficcontrol";
 option java_package = "cn.polarismesh.polaris.trafficcontrol";
 
 import "google/protobuf/wrappers.proto";
-import "google/protobuf/any.proto";
 
 // configuration root for route
 message Routing {
-    // Rule belongs and namespace
-    google.protobuf.StringValue namespace = 1;
-    google.protobuf.StringValue service = 2;
+  // Rule belongs and namespace
+  string namespace = 1;
+  string service = 2;
 
-    // Each service can configure multiple inbound or outbound rules
-    // For each request, you can match from top to bottom, if you are in the
-    // middle, terminate
-	// For compatible only
-    repeated Route inbounds = 3;
-	// For compatible only
-    repeated Route outbounds = 4;
-
-	google.protobuf.StringValue ctime = 5;
-	google.protobuf.StringValue mtime = 6;
-	google.protobuf.StringValue revision = 7;
-
-	google.protobuf.StringValue service_token = 8 [json_name="service_token"];
-
-	google.protobuf.StringValue id = 9;
-
-    // Routers chain
-    repeated Router routers = 10;
-	
-	// Failover config for routers
-    FailoverConfig failover = 11;
-}
-
-enum RoutingPolicy {
-	// Route by rule rule
-	RulePolicy = 0;
-	// Route by destination metadata
-	MetadataPolicy = 1;
-	// Route by nearby locality
-	LocalityPolicy = 2;
-}
-
-// router configuration
-message Router {
-    // Enable this router
-    google.protobuf.BoolValue enable = 1;
-	
-	// Router type
-	RoutingPolicy routing_policy = 2;
-	
-	// Routing configuration for router
-	google.protobuf.Any routing_config = 3;
-}
-
-// MatchString
-message MatchString {
-  enum MatchStringType {
-
-    // Equivalent match
-    EXACT = 0;
-    // Regular match
-    REGEX = 1;
-	// Not equals match
-	NOT_EQUALS = 2;
-	// Include match
-	INCLUDE = 3;
-	// Not include match
-	NOT_INCLUDE = 4;
-  }
-
-  enum ValueType {
-    // Routing rules write dead data  
-    TEXT = 0;
-    // Routing data is obtained from the Metadata of the Motorcycle Service
-    PARAMETER = 1;
-    // Get routing data from the environment variable of the main tone service
-    VARIABLE = 2;
-  }
-
-  // Matching rule
-  MatchStringType type = 1;
-
-  // Routing rules
-  google.protobuf.StringValue value = 2;
-
-  // Value type, specific acquisition path for routing rule values
-  ValueType value_type = 3;
-}
-
-// Locality for service instance
-message Locality {
-	// Region this zone belongs to
-	MatchString region = 1;
-	// Local zone where campus belongs to
-	MatchString zone = 2;
-	// Campus for the instance hosting
-	MatchString campus = 3;
-}
-
-message FailoverConfig {
-	// Enable degrade
-	google.protobuf.BoolValue enable = 1;
-	
-	// Degrade by left instance total
-	google.protobuf.UInt32Value total_count = 2;
-	
-	// Degrade by healthy instance total
-	google.protobuf.UInt32Value healthy_count = 3;
-	
-	// Degrade by healthy instance precent
-	google.protobuf.UInt32Value healthy_percent = 4;
-}
-
-
-// Routing by rules
-message RuleRoutingConfig {
   // Each service can configure multiple inbound or outbound rules
   // For each request, you can match from top to bottom, if you are in the
   // middle, terminate
-  repeated Route inbounds = 1;
-  repeated Route outbounds = 2;
+  // For compatible only
+  repeated Route inbounds = 3;
+  // For compatible only
+  repeated Route outbounds = 4;
+
+  string revision = 7;
+
+  string id = 10;
+
+  // route rule name
+  string name = 11;
 }
 
 message Route {
   // If you match the Source rule, follow the Destination route
   // The relationship between multiple SOURCE is or
   repeated Source sources = 1;
+  // 
   repeated Destination destinations = 2;
 }
 
 message Source {
   // Main tuning service and namespace
-  google.protobuf.StringValue service = 1;
-  google.protobuf.StringValue namespace = 2;
+  string service = 1;
+  string namespace = 2;
 
   // Master Control Service Example Tag or Request Label
   // Value supports regular matching
-  map<string, MatchString> metadata = 3;
-  
-  // Locality info for caller service
-  Locality locality = 4;
+  repeated MatchArgument arguments = 3;
 }
 
 message Destination {
   // Templated service and namespace
-  google.protobuf.StringValue service = 1;
-  google.protobuf.StringValue namespace = 2;
+  string service = 1;
+  string namespace = 2;
 
   // Templated service example label
   // Value supports regular matching
-  map<string, MatchString> metadata = 3;
+  map<string, string> labels = 3;
 
   // According to the service name and service instance Metadata Filter the
   // qualified service instance subset Service instance subset can set priority
@@ -171,39 +71,104 @@ message Destination {
   google.protobuf.UInt32Value weight = 5;
 
   // Forward requests to proxy service
-  google.protobuf.StringValue transfer = 6;
+  string transfer = 6;
 
   // Whether to isolate the SET, after isolation, no traffic will be allocated
-  google.protobuf.BoolValue isolate = 7;
-  
+  bool isolate = 7;
+
   // Locality info for destination
-  Locality locality = 8;
+  LocalityRoutingConfig locality = 8;
+}
+
+// MatchString
+message MatchString {
+  enum MatchStringType {
+    // Equivalent match
+    EQUALS = 0;
+    // Not equals match
+    NOT_EQUALS = 1;
+    // Include match
+    INCLUDE = 2;
+    // Not include match
+    NOT_INCLUDE = 3;
+    // Less than match
+    LESS_THAN = 4;
+    // Greater than match
+    GREATER_THAN = 5;
+    // Regular match
+    REGEX = 6;
+  }
+
+  enum ValueType {
+    // Routing rules write dead data
+    TEXT = 0;
+  }
+
+  // Matching rule
+  MatchStringType type = 1;
+
+  // Routing rules
+  string value = 2;
+
+  // Value type, specific acquisition path for routing rule values
+  ValueType value_type = 3;
+}
+
+message MatchArgument {
+  // label type for gateway request
+  enum Type {
+    // custom arguments
+    CUSTOM = 0;
+    // method, match the http post/get/put/delete or grpc method
+    METHOD = 1;
+    // header, match the http header, dubbo attachment, grpc header
+    HEADER = 2;
+    // query, match the http query, dubbo argument
+    QUERY = 3;
+    // caller service
+    CALLER_SERVICE = 4;
+    // caller host ip
+    CALLER_IP = 5;
+  }
+  Type type = 1;
+  // header key or query key
+  string key = 2;
+  // header value or query value
+  MatchString value = 3;
+}
+
+message FailoverConfig {
+  // Enable degrade
+  bool enable = 1;
+
+  // Degrade by left instance total
+  uint32 total_count = 2;
+
+  // Degrade by healthy instance total
+  uint32 healthy_count = 3;
+
+  // Degrade by healthy instance precent
+  uint32 healthy_percent = 4;
 }
 
 message LocalityRoutingConfig {
-	
-	enum LocalityLevel {
-		CAMPUS = 0;
-		ZONE = 1;
-		REGION = 2;
-		ALL = 3;
-	}
-	
-	// Starting locality level
-	LocalityLevel locality_level = 1;
-	
-	// When failover, the router will down to match higher level, here define the max failover level
-	LocalityLevel max_locality_level = 2;
-}
 
-message MetadataRoutingConfig {
-	
-	enum FailoverRange {
-	   ALL = 0;
-	   OTHERS = 1;
-	   OTHER_KEYS = 2;
-	}
-	
-	// When metadata not found, it will fall back to the 
-	FailoverRange failover_range = 1;
+  enum LocalityLevel {
+    CAMPUS = 0;
+    ZONE = 1;
+    REGION = 2;
+    ALL = 3;
+  }
+
+  // Starting locality level
+  LocalityLevel locality_level = 1;
+  // When failover, the router will down to match higher level, here define the
+  // max failover level
+  LocalityLevel max_locality_level = 2;
+  // Whether to allow the nearest route downgrade according to different health levels
+  bool enableDegradeByUnhealthyPercent = 3;
+  // Sets the percentage of unhealthy instances that trigger the nearest route matching downgrade
+  bool unhealthyPercentToDegrade = 4;
+  // Enable degrade
+  bool enable = 5;
 }
