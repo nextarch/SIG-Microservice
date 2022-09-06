@@ -5,35 +5,86 @@ package trafficcontrol;
 option go_package = "api/v1/trafficcontrol";
 option java_package = "cn.polarismesh.polaris.trafficcontrol";
 
-import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+
+// FlowStaining 流量染色
+message FlowStaining {
+  string id = 10;
+  // flow statining rule name
+  string name = 2;
+  // rules staining rules
+  repeated StaineRule rules = 3;
+}
+
+message StaineRule {
+  // Traffic matching rules
+  repeated SourceMatch arguments = 1;
+  // Staining label
+  repeated StaineLabel labels = 2;
+  // Stain Label
+  uint32 priority = 3;
+  // rule is enabled
+  bool enable = 4;
+  // Set the percentage of traffic that needs to be dyed
+  uint32 stainePercent = 5;
+}
+
+message StaineLabel {
+  string Key = 1;
+  string Value = 2;
+}
+
+enum RoutingPolicy {
+  // Route by rule rule => RuleRoutingConfig
+  RulePolicy = 0;
+  // Route by destination metadata
+  MetadataPolicy = 1;
+}
 
 // configuration root for route
 message Routing {
-  // Rule belongs and namespace
-  string namespace = 1;
-  string service = 2;
-
-  // Each service can configure multiple inbound or outbound rules
-  // For each request, you can match from top to bottom, if you are in the
-  // middle, terminate
-  // For compatible only
-  repeated Route inbounds = 3;
-  // For compatible only
-  repeated Route outbounds = 4;
-
-  string revision = 7;
-
-  string id = 10;
-
+  string id = 1;
   // route rule name
-  string name = 11;
+  string name = 2;
+  // namespace namingspace of routing rules
+  string namespace = 3;
+  // Enable this router
+  bool enable = 4;
+  // Router type
+  RoutingPolicy routing_policy = 5;
+  // Routing configuration for router
+  google.protobuf.Any routing_config = 6;
+  // revision routing version
+  string revision = 7;
 }
 
-message Route {
-  // If you match the Source rule, follow the Destination route
-  // The relationship between multiple SOURCE is or
-  repeated Source sources = 1;
-  // 
+message MetadataFailover {
+  enum FailoverRange {
+    // ALL return all instances
+    ALL = 0;
+    // OTHERS retuen without thie labels instances
+    OTHERS = 1;
+    // OTHER_KEYS return other instances which match keys
+    OTHER_KEYS = 2;
+  }
+  // failover_range metadata route bottom type
+  FailoverRange failover_range = 1;
+  // only use to failover_range == OTHER_KEYS
+  map<string, string> labels = 2;
+}
+
+// MetadataRoutingConfig metadata routing configuration
+message MetadataRoutingConfig {
+  map<string, string> labels = 1;
+  // When metadata not found, it will fall back to the
+  MetadataFailover failover = 2;
+}
+
+// RuleRoutingConfig routing configuration
+message RuleRoutingConfig {
+  // source source info
+  repeated Source source = 1;
+  // destination destinations info
   repeated Destination destinations = 2;
 }
 
@@ -44,7 +95,7 @@ message Source {
 
   // Master Control Service Example Tag or Request Label
   // Value supports regular matching
-  repeated MatchArgument arguments = 3;
+  repeated SourceMatch arguments = 3;
 }
 
 message Destination {
@@ -54,7 +105,7 @@ message Destination {
 
   // Templated service example label
   // Value supports regular matching
-  map<string, string> labels = 3;
+  map<string, MatchString> labels = 3;
 
   // According to the service name and service instance Metadata Filter the
   // qualified service instance subset Service instance subset can set priority
@@ -67,54 +118,39 @@ message Destination {
   // priority is not set. If the part is set, some is not set, it is considered
   // that the weight is not set to 0 If you have no weight, you think the weight
   // is the same
-  google.protobuf.UInt32Value priority = 4;
-  google.protobuf.UInt32Value weight = 5;
+  uint32 priority = 4;
+  uint32 weight = 5;
 
   // Forward requests to proxy service
   string transfer = 6;
 
   // Whether to isolate the SET, after isolation, no traffic will be allocated
   bool isolate = 7;
-
-  // Locality info for destination
-  LocalityRoutingConfig locality = 8;
 }
 
 // MatchString
 message MatchString {
   enum MatchStringType {
-    // Equivalent match
     EQUALS = 0;
-    // Not equals match
     NOT_EQUALS = 1;
-    // Include match
-    INCLUDE = 2;
-    // Not include match
-    NOT_INCLUDE = 3;
-    // Less than match
-    LESS_THAN = 4;
-    // Greater than match
-    GREATER_THAN = 5;
-    // Regular match
-    REGEX = 6;
+    IN = 2;
+    NOT_IN = 3;
+    REGEX = 4;
   }
 
   enum ValueType {
     // Routing rules write dead data
     TEXT = 0;
   }
-
   // Matching rule
   MatchStringType type = 1;
-
   // Routing rules
   string value = 2;
-
   // Value type, specific acquisition path for routing rule values
   ValueType value_type = 3;
 }
 
-message MatchArgument {
+message SourceMatch {
   // label type for gateway request
   enum Type {
     // custom arguments
@@ -125,50 +161,14 @@ message MatchArgument {
     HEADER = 2;
     // query, match the http query, dubbo argument
     QUERY = 3;
-    // caller service
-    CALLER_SERVICE = 4;
     // caller host ip
-    CALLER_IP = 5;
+    CALLER_IP = 4;
+    // path, math the http url
+    PATH = 5;
   }
   Type type = 1;
   // header key or query key
   string key = 2;
   // header value or query value
   MatchString value = 3;
-}
-
-message FailoverConfig {
-  // Enable degrade
-  bool enable = 1;
-
-  // Degrade by left instance total
-  uint32 total_count = 2;
-
-  // Degrade by healthy instance total
-  uint32 healthy_count = 3;
-
-  // Degrade by healthy instance precent
-  uint32 healthy_percent = 4;
-}
-
-message LocalityRoutingConfig {
-
-  enum LocalityLevel {
-    CAMPUS = 0;
-    ZONE = 1;
-    REGION = 2;
-    ALL = 3;
-  }
-
-  // Starting locality level
-  LocalityLevel locality_level = 1;
-  // When failover, the router will down to match higher level, here define the
-  // max failover level
-  LocalityLevel max_locality_level = 2;
-  // Whether to allow the nearest route downgrade according to different health levels
-  bool enableDegradeByUnhealthyPercent = 3;
-  // Sets the percentage of unhealthy instances that trigger the nearest route matching downgrade
-  bool unhealthyPercentToDegrade = 4;
-  // Enable degrade
-  bool enable = 5;
 }
