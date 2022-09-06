@@ -5,7 +5,6 @@ package trafficcontrol;
 option go_package = "api/v1/trafficcontrol";
 option java_package = "cn.polarismesh.polaris.trafficcontrol";
 
-import "google/protobuf/wrappers.proto";
 import "google/protobuf/any.proto";
 
 // FlowStaining 流量染色
@@ -13,7 +12,7 @@ message FlowStaining {
   string id = 10;
   // flow statining rule name
   string name = 2;
-  //
+  // rules staining rules
   repeated StaineRule rules = 3;
 }
 
@@ -47,47 +46,46 @@ message Routing {
   string id = 1;
   // route rule name
   string name = 2;
-  // namespace 路由规则所属的命名空间
+  // namespace namingspace of routing rules
   string namespace = 3;
   // Enable this router
-  google.protobuf.BoolValue enable = 4;
+  bool enable = 4;
   // Router type
   RoutingPolicy routing_policy = 5;
   // Routing configuration for router
   google.protobuf.Any routing_config = 6;
-  // revision 当前路由规则的版本信息
+  // revision routing version
   string revision = 7;
 }
 
 message MetadataFailover {
   enum FailoverRange {
-    // ALL 直接返回全部实例
+    // ALL return all instances
     ALL = 0;
-    // OTHERS 返回没有这些标签的实例
+    // OTHERS retuen without thie labels instances
     OTHERS = 1;
-    // OTHER_KEYS 根据另外一组标签进行筛选
+    // OTHER_KEYS return other instances which match keys
     OTHER_KEYS = 2;
   }
-  // 元数据路由兜底类型
+  // failover_range metadata route bottom type
   FailoverRange failover_range = 1;
-  // 仅仅用于 failover_range == OTHER_KEYS 时生效
+  // only use to failover_range == OTHER_KEYS
   map<string, string> labels = 2;
 }
 
-// MetadataRoutingConfig 元数据路由配置
+// MetadataRoutingConfig metadata routing configuration
 message MetadataRoutingConfig {
   map<string, string> labels = 1;
   // When metadata not found, it will fall back to the
   MetadataFailover failover = 2;
 }
 
-// RuleRoutingConfig 规则路由配置
+// RuleRoutingConfig routing configuration
 message RuleRoutingConfig {
-  // If you match the Source rule, follow the Destination route
-  // The relationship between multiple SOURCE is or
-  Source source = 1;
-  //
-  Destination destination = 2;
+  // source source info
+  repeated Source source = 1;
+  // destination destinations info
+  repeated Destination destinations = 2;
 }
 
 message Source {
@@ -107,7 +105,7 @@ message Destination {
 
   // Templated service example label
   // Value supports regular matching
-  map<string, string> labels = 3;
+  map<string, MatchString> labels = 3;
 
   // According to the service name and service instance Metadata Filter the
   // qualified service instance subset Service instance subset can set priority
@@ -133,20 +131,11 @@ message Destination {
 // MatchString
 message MatchString {
   enum MatchStringType {
-    // Equivalent match
     EQUALS = 0;
-    // Not equals match
     NOT_EQUALS = 1;
-    // Include match
-    INCLUDE = 2;
-    // Not include match
-    NOT_INCLUDE = 3;
-    // Less than match
-    LESS_THAN = 4;
-    // Greater than match
-    GREATER_THAN = 5;
-    // Regular match
-    REGEX = 6;
+    IN = 2;
+    NOT_IN = 3;
+    REGEX = 4;
   }
 
   enum ValueType {
@@ -174,6 +163,8 @@ message SourceMatch {
     QUERY = 3;
     // caller host ip
     CALLER_IP = 4;
+    // path, math the http url
+    PATH = 5;
   }
   Type type = 1;
   // header key or query key
