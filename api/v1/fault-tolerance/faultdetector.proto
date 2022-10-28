@@ -4,3 +4,87 @@ package faulttolerance;
 
 option go_package = "api/v1/faulttolerance";
 option java_package = "cn.polarismesh.polaris.faulttolerance";
+
+enum Operation {
+  // Equivalent match
+  EXACT = 0;
+  // Regular match
+  REGEX = 1;
+  // Not equals match
+  NOT_EQUALS = 2;
+  // Include match
+  IN = 3;
+  // Not include match
+  NOT_IN = 4;
+}
+
+enum StringMatcher {
+  // the operation to compare values
+  Operation operation = 1;
+  // the values to compare
+  repeated string values = 2;
+}
+
+message RuleMatcher {
+  // match the namespace
+  StringMatcher namespace = 1;
+  // match the service name
+  StringMatcher service = 2;
+  // match the calling method
+  StringMatcher method = 3;
+}
+
+enum DetectMode {
+	// no fault detect will be enable
+    NEVER = 0;
+    // detect only when resources failed
+    ON_RECOVER = 1;
+    // always active fault detect
+    ALWAYS = 2;
+}
+
+// main rule for fault detecor
+message FaultDetectorRule {
+  //rule name
+  string name = 1;
+  // matcher rule
+  RuleMatcher matcher = 2;
+  // when to active fault detect
+  DetectMode mode = 3;
+  // detect interval
+  uint32 interval = 4;
+  // detect timeout
+  uint32 timeout = 5;
+  // specific detect config
+  repeated google.protobuf.Any detect_config = 6;
+}
+
+// http check config
+message HTTPDetector {
+  string method = 1;
+  string path = 2;
+  string host = 3;
+  uint32 port = 4;
+  map<string, string> headersToAdd = 5;
+}
+
+// grpc check config, the application should implement the HealthCheckService(https://github.com/grpc/grpc/blob/master/doc/health-checking.md)
+message GRPCDetector {
+  string host = 1;
+  uint32 port = 2;  
+}
+
+// tcp check config, use the choose the check by connect or by send and receive data
+message TCPDetector {
+  uint32 port = 1;
+  bool connect_check = 2;
+  string send = 3;
+  repeated string receive = 4;
+}
+
+// udp check config, only support send and receive data check
+message UDPDetector {
+  uint32 port = 1;
+  string send = 2;
+  repeated string receive = 3;
+}
