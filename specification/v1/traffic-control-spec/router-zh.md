@@ -157,7 +157,55 @@ spec:
 
 #### 跨进程间标签传递
 
-// TODO 附件能力
+这里已 Dubbo 和 gRPC 为例
+
+> Dubbo
+
+- Dubbo 中，可以通过 RpcContext 上的 setAttachment 和 getAttachment 在服务消费方和提供方之间进行参数的隐式传递
+- Dubbo 的 RpcContext 分为了四个部分
+  - ServiceContext：在 Dubbo 内部使用，用于传递调用链路上的参数信息，如 invoker 对象等
+  - ClientAttachment：在 Client 端使用，往 ClientAttachment 中写入的参数将被传递到 Server 端
+  - ServerAttachment：在 Server 端使用，从 ServerAttachment 中读取的参数是从 Client 中传递过来的
+  - ServerContext：在 Client 端和 Server 端使用，用于从 Server 端回传 Client 端使用，Server 端写入到 ServerContext 的参数在调用结束后可以在 Client 端的 ServerContext 获取到
+  - ![](https://cn.dubbo.apache.org/imgs/v3/concepts/rpccontext.png)
+- 在服务消费方端设置隐式参数，具体的使用方式
+  - ```java
+    RpcContext.getClientAttachment().setAttachment("key", "value")
+    ```
+
+> gRPC
+
+- gRPC 中并没有专门用于服务消费方和提供方之间的隐式传参设计，仅设计了用于本地传播的 io.grpc.Context
+- 如果需要将 io.grpc.Context 的数据传递到下游，则需要实现 ClientInterceptor 拦截器，将 io.grpc.Context 的数据拷贝到 Metadata 中
+- gRPC 中的 Metadata 数据传递依托于 http 协议的 header 数据部分进行传递
+- 使用方式
+  - ```java
+    public static final Context.Key<String> MOCK_INFO = Context.key("mock_info");
+
+    ...
+    public class MockClientInterceptor implements ClientInterceptor {
+      @Override
+      public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(...) {
+    
+        return new ForwardingClientCall
+          .SimpleForwardingClientCall<ReqT, RespT>(...) {
+          @Override
+          public void start(...) {
+            String mockInfo = Constant.MOCK_INFO.get();
+            if (mockInfo != null) {
+              headers.put(Constant.MOCK_METADATA_KEY, mockInfo);
+            }
+            super.start(responseListener, headers);
+          }
+        };
+      }
+    }
+
+    ...
+    final ManagedChannel mockChannel = ManagedChannelBuilder
+      .intercept(new MockClientInterceptor())
+      .build();
+    ```
 
 #### 进程内标签传递
 
